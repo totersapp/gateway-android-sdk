@@ -8,9 +8,9 @@ import com.mastercard.gateway.android.sdk.Gateway;
 
 public enum Config {
 
-    MERCHANT_ID(""),
-    REGION(Gateway.Region.NORTH_AMERICA.name()),
-    MERCHANT_URL("");
+    MERCHANT_ID("TEST222205234001"),
+    REGION(Gateway.Region.ASIA_PACIFIC.name()),
+    MERCHANT_URL("https://ap-gateway.mastercard.com/api/rest/version/53/merchant/TEST222205234001");
 
     String defValue;
 

@@ -158,20 +158,17 @@ public class ApiController {
     }
 
     Pair<String, String> executeCreateSession() throws Exception {
-        String jsonResponse = doJsonRequest(new URL(merchantServerUrl + "/session.php"), "", "POST", null, null, HttpsURLConnection.HTTP_OK);
+        String jsonResponse = doJsonRequest(new URL(merchantServerUrl + "/session"), "", "POST", "",
+                "", HttpURLConnection.HTTP_CREATED);
 
         GatewayMap response = new GatewayMap(jsonResponse);
 
-        if (!response.containsKey("gatewayResponse")) {
-            throw new RuntimeException("Could not read gateway response");
+        if (!response.containsKey("result") || !"SUCCESS".equalsIgnoreCase((String) response.get("result"))) {
+            throw new RuntimeException("Create session result: " + response.get("result"));
         }
 
-        if (!response.containsKey("gatewayResponse.result") || !"SUCCESS".equalsIgnoreCase((String) response.get("gatewayResponse.result"))) {
-            throw new RuntimeException("Create session result: " + response.get("gatewayResponse.result"));
-        }
-
-        String apiVersion = (String) response.get("apiVersion");
-        String sessionId = (String) response.get("gatewayResponse.session.id");
+        String apiVersion = "53";
+        String sessionId = (String) response.get("session.id");
         Log.i("createSession", "Created session with ID " + sessionId + " with API version " + apiVersion);
 
         return new Pair<>(sessionId, apiVersion);
@@ -187,18 +184,11 @@ public class ApiController {
 
         String jsonRequest = GSON.toJson(request);
 
-        String jsonResponse = doJsonRequest(new URL(merchantServerUrl + "/3DSecure.php?3DSecureId=" + threeDSecureId), jsonRequest, "PUT", null, null, HttpsURLConnection.HTTP_OK);
+        String jsonResponse = doJsonRequest(new URL(merchantServerUrl + "/3DSecureId/" + threeDSecureId),
+                jsonRequest, "PUT", null, null, HttpsURLConnection.HTTP_CREATED);
 
         GatewayMap response = new GatewayMap(jsonResponse);
 
-        if (!response.containsKey("gatewayResponse")) {
-            throw new RuntimeException("Could not read gateway response");
-        }
-
-        // if there is an error result, throw it
-        if (response.containsKey("gatewayResponse.result") && "ERROR".equalsIgnoreCase((String) response.get("gatewayResponse.result"))) {
-            throw new RuntimeException("Check 3DS Enrollment Error: " + response.get("gatewayResponse.error.explanation"));
-        }
 
         return response;
     }
@@ -298,11 +288,7 @@ public class ApiController {
         connection.setFixedLengthStreamingMode(json.getBytes().length);
         connection.setRequestProperty("Content-Type", "application/json");
 
-        if (!isEmpty(username) && !isEmpty(password)) {
-            String basicAuth = username + ':' + password;
-            basicAuth = Base64.encodeToString(basicAuth.getBytes(), Base64.DEFAULT);
-            connection.setRequestProperty("Authorization", "Basic " + basicAuth);
-        }
+        connection.setRequestProperty("Authorization", "Basic " + "bWVyY2hhbnQuVEVTVDIyMjIwNTIzNDAwMTo4ZWRlYzA3MzFmNjYyOGVkNGUyNTViY2I1MmFkYTQwNQ==");
 
         PrintWriter out = new PrintWriter(connection.getOutputStream());
         out.print(json);

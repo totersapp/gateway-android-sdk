@@ -268,7 +268,7 @@ public class ProcessPaymentActivity extends AppCompatActivity {
         @Override
         public void onSuccess(GatewayMap response) {
             int apiVersionInt = Integer.valueOf(apiVersion);
-            String threeDSecureId = (String) response.get("gatewayResponse.3DSecureID");
+            String threeDSecureId = (String) response.get("3DSecureID");
 
             String html = null;
             if (response.containsKey("gatewayResponse.3DSecure.authenticationRedirect.simple.htmlBodyContent")) {
